@@ -12,7 +12,7 @@ import { validateEnvironment } from './config/environment.validation.js';
       cache: true,
       validate: validateEnvironment,
     }),
-  ],
+
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
