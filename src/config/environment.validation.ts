@@ -18,6 +18,6 @@ type Environment = z.infer<typeof environmentSchema>;
 
 export function validateEnvironment(
   config: Record<string, unknown>,
-): Record<string, unknown> {
+): Environment {
   return environmentSchema.parse(config);
 }

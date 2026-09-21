@@ -4,6 +4,11 @@ import { AppService } from './app.service.js';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { validateEnvironment } from './config/environment.validation.js';
+import { UsersModule } from './users/users.module.js';
+import { ProjectsModule } from './projects/projects.module.js';
+import { WebhookEndpointsModule } from './webhook-endpoints/webhook-endpoints.module.js';
+import { EventsModule } from './events/events.module.js';
+import { DeliveriesModule } from './deliveries/deliveries.module.js';
 
 @Module({
   imports: [
@@ -26,6 +31,16 @@ import { validateEnvironment } from './config/environment.validation.js';
         synchronize: false,
       }),
     }),
+
+    UsersModule,
+
+    ProjectsModule,
+
+    WebhookEndpointsModule,
+
+    EventsModule,
+
+    DeliveriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
