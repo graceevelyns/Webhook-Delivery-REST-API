@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -35,6 +36,7 @@ export class Project {
   updatedAt!: Date;
 
   @ManyToOne(() => User, (user) => user.projects, { onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'user_id' })
   user!: Relation<User>;
 
   @OneToMany(

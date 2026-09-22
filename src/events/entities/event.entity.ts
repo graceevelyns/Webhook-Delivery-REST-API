@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -32,6 +33,7 @@ export class Event {
   @ManyToOne(() => Project, (project) => project.events, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'project_id' })
   project!: Relation<Project>;
 
   @OneToMany(() => Delivery, (delivery) => delivery.event)

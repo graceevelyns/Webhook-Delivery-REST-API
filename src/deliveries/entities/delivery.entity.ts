@@ -4,6 +4,7 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -73,6 +74,7 @@ export class Delivery {
   finishedAt!: Date | null;
 
   @ManyToOne(() => Event, (event) => event.deliveries, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'event_id' })
   event!: Relation<Event>;
 
   @ManyToOne(
@@ -80,5 +82,6 @@ export class Delivery {
     (webhookEndpoint) => webhookEndpoint.deliveries,
     { onDelete: 'RESTRICT' },
   )
+  @JoinColumn({ name: 'webhook_endpoint_id' })
   webhookEndpoint!: Relation<WebhookEndpoint>;
 }

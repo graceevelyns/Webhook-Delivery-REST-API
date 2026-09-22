@@ -4,6 +4,7 @@ import {
   DeleteDateColumn,
   Entity,
   Index,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -43,6 +44,7 @@ export class WebhookEndpoint {
   @ManyToOne(() => Project, (project) => project.webhookEndpoints, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'project_id' })
   project!: Relation<Project>;
 
   @OneToMany(() => Delivery, (delivery) => delivery.webhookEndpoint)
