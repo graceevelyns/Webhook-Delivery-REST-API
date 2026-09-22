@@ -1,6 +1,7 @@
 {
   "name": "Webhook-Delivery-REST-API",
   "version": "0.0.1",
+  "packageManager": "pnpm@12.4.2",
   "description": "",
   "author": "",
   "private": true,
