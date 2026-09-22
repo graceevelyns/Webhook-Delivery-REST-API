@@ -73,7 +73,7 @@ export class WebhookEndpointsService {
     userId: string,
     dto: UpdateWebhookEndpointDto,
   ): Promise<WebhookEndpoint> {
-    if (Object.keys(dto).length === 0) {
+    if (dto.name === undefined && dto.url === undefined && dto.isActive === undefined) {
       throw new BadRequestException('No fields to update');
     }
 

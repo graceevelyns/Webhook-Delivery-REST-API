@@ -48,7 +48,7 @@ export class ProjectsService {
     userId: string,
     dto: UpdateProjectDto,
   ): Promise<Project> {
-    if (Object.keys(dto).length === 0) {
+    if (dto.name === undefined && dto.description === undefined) {
       throw new BadRequestException('No fields to update');
     }
 
