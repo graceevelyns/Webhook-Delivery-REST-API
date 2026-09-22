@@ -1,7 +1,7 @@
-import { IsOptional, IsString, IsNotEmpty, MaxLength } from 'class-validator';
+import { IsOptional, IsString, IsNotEmpty, MaxLength, ValidateIf } from 'class-validator';
 
 export class UpdateProjectDto {
-  @IsOptional()
+  @ValidateIf((_, value: unknown) => value !== undefined)
   @IsString()
   @IsNotEmpty()
   @MaxLength(100)
@@ -9,5 +9,5 @@ export class UpdateProjectDto {
 
   @IsOptional()
   @IsString()
-  description?: string;
+  description?: string | null;
 }

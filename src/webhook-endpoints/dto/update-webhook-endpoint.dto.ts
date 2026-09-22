@@ -1,27 +1,27 @@
 import {
   IsBoolean,
   IsNotEmpty,
-  IsOptional,
   IsString,
   IsUrl,
   MaxLength,
+  ValidateIf,
 } from 'class-validator';
 
 export class UpdateWebhookEndpointDto {
-  @IsOptional()
+  @ValidateIf((_, value: unknown) => value !== undefined)
   @IsString()
   @IsNotEmpty()
   @MaxLength(100)
   name?: string;
 
-  @IsOptional()
+  @ValidateIf((_, value: unknown) => value !== undefined)
   @IsUrl({
     require_protocol: true,
     protocols: ['http', 'https'],
   })
   url?: string;
 
-  @IsOptional()
+  @ValidateIf((_, value: unknown) => value !== undefined)
   @IsBoolean()
   isActive?: boolean;
 }
