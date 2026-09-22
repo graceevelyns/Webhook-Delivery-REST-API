@@ -9,6 +9,7 @@ import { ProjectsModule } from './projects/projects.module.js';
 import { WebhookEndpointsModule } from './webhook-endpoints/webhook-endpoints.module.js';
 import { EventsModule } from './events/events.module.js';
 import { DeliveriesModule } from './deliveries/deliveries.module.js';
+import { AuthModule } from './auth/auth.module.js';
 
 @Module({
   imports: [
@@ -41,6 +42,8 @@ import { DeliveriesModule } from './deliveries/deliveries.module.js';
     EventsModule,
 
     DeliveriesModule,
+
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
