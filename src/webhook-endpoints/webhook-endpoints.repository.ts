@@ -59,4 +59,10 @@ export class WebhookEndpointsRepository {
     });
     return (result.affected ?? 0) > 0;
   }
+
+  findActiveByProject(projectId: string): Promise<WebhookEndpoint[]> {
+    return this.repository.find({
+      where: { projectId, isActive: true },
+    });
+  }
 }
