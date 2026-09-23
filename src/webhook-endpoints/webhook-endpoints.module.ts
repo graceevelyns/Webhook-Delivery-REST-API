@@ -15,5 +15,6 @@ import { WebhookEndpointsRepository } from './webhook-endpoints.repository.js';
   ],
   controllers: [WebhookEndpointsController],
   providers: [WebhookEndpointsService, WebhookEndpointsRepository],
+  exports: [WebhookEndpointsRepository],
 })
 export class WebhookEndpointsModule {}
