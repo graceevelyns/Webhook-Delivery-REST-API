@@ -7,12 +7,14 @@ import { ProjectsRepository } from '../projects/projects.repository.js';
 import { CreateEventDto } from './dto/create-event.dto.js';
 import { Event } from './entities/event.entity.js';
 import { EventsRepository } from './events.repository.js';
+import { DeliveriesService } from '../deliveries/deliveries.service.js';
 
 @Injectable()
 export class EventsService {
   constructor(
     private readonly eventsRepository: EventsRepository,
     private readonly projectsRepository: ProjectsRepository,
+    private readonly deliveriesService: DeliveriesService,
   ) {}
 
   async create(
@@ -27,11 +29,15 @@ export class EventsService {
       throw new BadRequestException('Event type cannot be empty');
     }
 
-    return this.eventsRepository.create({
+    const event = await this.eventsRepository.create({
       projectId,
       type,
       payload: dto.payload,
     });
+
+    await this.deliveriesService.createPendingForEvent(event);
+
+    return event;
   }
 
   async findAll(projectId: string, userId: string): Promise<Event[]> {
