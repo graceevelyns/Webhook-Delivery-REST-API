@@ -7,6 +7,11 @@ import { AppModule } from '../src/app.module.js';
 import { Event } from '../src/events/entities/event.entity.js';
 import { Project } from '../src/projects/entities/project.entity.js';
 import { User } from '../src/users/entities/user.entity.js';
+import {
+  Delivery,
+  DeliveryStatus,
+} from '../src/deliveries/entities/delivery.entity.js';
+import { WebhookEndpoint } from '../src/webhook-endpoints/entities/webhook-endpoint.entity.js';
 
 describe('Events (e2e)', () => {
   let app: INestApplication;
@@ -67,7 +72,24 @@ describe('Events (e2e)', () => {
 
         if (projectIds.length > 0) {
           await dataSource
+            .getRepository(Delivery)
+            .createQueryBuilder()
+            .delete()
+            .where(
+              'event_id IN (SELECT id FROM events WHERE project_id IN (:...projectIds))',
+              { projectIds },
+            )
+            .execute();
+
+          await dataSource
             .getRepository(Event)
+            .createQueryBuilder()
+            .delete()
+            .where('project_id IN (:...projectIds)', { projectIds })
+            .execute();
+
+          await dataSource
+            .getRepository(WebhookEndpoint)
             .createQueryBuilder()
             .delete()
             .where('project_id IN (:...projectIds)', { projectIds })
@@ -96,6 +118,13 @@ describe('Events (e2e)', () => {
       .expect(201);
 
     const projectId = projectResponse.body.id as string;
+    const endpointResponse = await request(app.getHttpServer())
+      .post(`/projects/${projectId}/webhook-endpoints`)
+      .set('Authorization', `Bearer ${ownerToken}`)
+      .send({ name: 'Event E2E Endpoint', url: 'https://example.com/webhook' })
+      .expect(201);
+
+    const endpointId = endpointResponse.body.id as string;
 
     await request(app.getHttpServer())
       .post(`/projects/${projectId}/events`)
@@ -127,6 +156,15 @@ describe('Events (e2e)', () => {
       .expect(201);
 
     const eventId = created.body.id as string;
+    const deliveries = await dataSource.getRepository(Delivery).find({
+      where: { eventId },
+    });
+
+    expect(deliveries).toHaveLength(1);
+    expect(deliveries[0].webhookEndpointId).toBe(endpointId);
+    expect(deliveries[0].targetUrl).toBe('https://example.com/webhook');
+    expect(deliveries[0].attemptNumber).toBe(1);
+    expect(deliveries[0].status).toBe(DeliveryStatus.Pending);
 
     expect(created.body.projectId).toBe(projectId);
     expect(created.body.type).toBe('order.created');
