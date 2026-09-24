@@ -30,11 +30,32 @@ export class DeliveriesRepository {
     return this.repository.save(deliveries);
   }
 
-  findAllByEvent(eventId: string): Promise<Delivery[]> {
+  findAllByEventAndProject(
+    eventId: string,
+    projectId: string,
+  ): Promise<Delivery[]> {
     return this.repository.find({
-      where: { eventId },
+      where: {
+        eventId,
+        event: {
+          projectId,
+        },
+      },
       order: {
         createdAt: 'DESC',
+      },
+    });
+  }
+
+  findOneByIdAndUser(id: string, userId: string): Promise<Delivery | null> {
+    return this.repository.findOne({
+      where: {
+        id,
+        event: {
+          project: {
+            userId,
+          },
+        },
       },
     });
   }
