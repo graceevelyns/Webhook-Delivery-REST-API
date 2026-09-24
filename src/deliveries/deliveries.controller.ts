@@ -5,6 +5,7 @@ import {
   ParseUUIDPipe,
   Req,
   UseGuards,
+  Post,
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard.js';
@@ -41,5 +42,13 @@ export class DeliveriesController {
     @Req() request: AuthenticatedRequest,
   ) {
     return this.deliveriesService.findOne(id, request.user.id);
+  }
+
+  @Post('deliveries/:id/retry')
+  retry(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.deliveriesService.retry(id, request.user.id);
   }
 }

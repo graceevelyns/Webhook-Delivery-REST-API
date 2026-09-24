@@ -63,7 +63,10 @@ export class DeliveriesRepository {
   async markProcessing(id: string): Promise<boolean> {
     const result = await this.repository.update(
       { id, status: DeliveryStatus.Pending },
-      { status: DeliveryStatus.Processing, startedAt: () => 'CURRENT_TIMESTAMP' },
+      {
+        status: DeliveryStatus.Processing,
+        startedAt: () => 'CURRENT_TIMESTAMP',
+      },
     );
     return (result.affected ?? 0) > 0;
   }
@@ -101,5 +104,48 @@ export class DeliveriesRepository {
         finishedAt: () => 'CURRENT_TIMESTAMP',
       },
     );
+  }
+
+  async create(data: CreateDeliveryData): Promise<Delivery> {
+    const delivery = this.repository.create({
+      ...data,
+      status: DeliveryStatus.Pending,
+    });
+
+    return this.repository.save(delivery);
+  }
+
+  findOneWithEventByIdAndUser(
+    id: string,
+    userId: string,
+  ): Promise<Delivery | null> {
+    return this.repository.findOne({
+      where: {
+        id,
+        event: {
+          project: {
+            userId,
+          },
+        },
+      },
+      relations: {
+        event: true,
+      },
+    });
+  }
+
+  findLatestAttempt(
+    eventId: string,
+    webhookEndpointId: string,
+  ): Promise<Delivery | null> {
+    return this.repository.findOne({
+      where: {
+        eventId,
+        webhookEndpointId,
+      },
+      order: {
+        attemptNumber: 'DESC',
+      },
+    });
   }
 }

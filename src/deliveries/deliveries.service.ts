@@ -1,7 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { Event } from '../events/entities/event.entity.js';
 import { WebhookEndpointsRepository } from '../webhook-endpoints/webhook-endpoints.repository.js';
-import { Delivery } from './entities/delivery.entity.js';
+import { Delivery, DeliveryStatus } from './entities/delivery.entity.js';
 import { DeliveriesRepository } from './deliveries.repository.js';
 import { ProjectsRepository } from '../projects/projects.repository.js';
 
@@ -121,5 +125,40 @@ export class DeliveriesService {
     );
 
     return deliveries;
+  }
+
+  async retry(id: string, userId: string): Promise<Delivery> {
+    const original =
+      await this.deliveriesRepository.findOneWithEventByIdAndUser(id, userId);
+
+    if (!original) {
+      throw new NotFoundException('Delivery not found');
+    }
+
+    if (original.status !== DeliveryStatus.Failed) {
+      throw new ConflictException('Only failed deliveries can be retried');
+    }
+
+    const latestAttempt = await this.deliveriesRepository.findLatestAttempt(
+      original.eventId,
+      original.webhookEndpointId,
+    );
+
+    if (!latestAttempt || latestAttempt.id !== original.id) {
+      throw new ConflictException(
+        'Only the latest delivery attempt can be retried',
+      );
+    }
+
+    const retryDelivery = await this.deliveriesRepository.create({
+      eventId: original.eventId,
+      webhookEndpointId: original.webhookEndpointId,
+      targetUrl: original.targetUrl,
+      attemptNumber: original.attemptNumber + 1,
+    });
+
+    await this.dispatch(retryDelivery, original.event);
+
+    return this.findOne(retryDelivery.id, userId);
   }
 }
