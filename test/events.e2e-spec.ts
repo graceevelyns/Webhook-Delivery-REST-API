@@ -12,6 +12,7 @@ import {
   DeliveryStatus,
 } from '../src/deliveries/entities/delivery.entity.js';
 import { WebhookEndpoint } from '../src/webhook-endpoints/entities/webhook-endpoint.entity.js';
+import { afterEach, vi } from 'vitest';
 
 describe('Events (e2e)', () => {
   let app: INestApplication;
@@ -20,6 +21,10 @@ describe('Events (e2e)', () => {
   const password = 'test-password-123';
   const ownerEmail = `event-owner-${randomUUID()}@example.com`;
   const otherEmail = `event-other-${randomUUID()}@example.com`;
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
 
   async function registerAndLogin(email: string): Promise<string> {
     await request(app.getHttpServer())
@@ -143,6 +148,15 @@ describe('Events (e2e)', () => {
       })
       .expect(404);
 
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response('accepted', {
+        status: 200,
+        headers: {
+          'content-type': 'text/plain',
+        },
+      }),
+    );
+
     const created = await request(app.getHttpServer())
       .post(`/projects/${projectId}/events`)
       .set('Authorization', `Bearer ${ownerToken}`)
@@ -164,7 +178,12 @@ describe('Events (e2e)', () => {
     expect(deliveries[0].webhookEndpointId).toBe(endpointId);
     expect(deliveries[0].targetUrl).toBe('https://example.com/webhook');
     expect(deliveries[0].attemptNumber).toBe(1);
-    expect(deliveries[0].status).toBe(DeliveryStatus.Pending);
+    expect(deliveries[0].status).toBe(DeliveryStatus.Success);
+    expect(deliveries[0].httpStatusCode).toBe(200);
+    expect(deliveries[0].responseBody).toBe('accepted');
+    expect(deliveries[0].startedAt).not.toBeNull();
+    expect(deliveries[0].finishedAt).not.toBeNull();
+    expect(fetchMock).toHaveBeenCalledOnce();
 
     expect(created.body.projectId).toBe(projectId);
     expect(created.body.type).toBe('order.created');

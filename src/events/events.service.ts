@@ -35,7 +35,7 @@ export class EventsService {
       payload: dto.payload,
     });
 
-    await this.deliveriesService.createPendingForEvent(event);
+    await this.deliveriesService.createAndDispatchForEvent(event);
 
     return event;
   }

@@ -112,4 +112,14 @@ export class DeliveriesService {
       );
     }
   }
+
+  async createAndDispatchForEvent(event: Event): Promise<Delivery[]> {
+    const deliveries = await this.createPendingForEvent(event);
+
+    await Promise.all(
+      deliveries.map((delivery) => this.dispatch(delivery, event)),
+    );
+
+    return deliveries;
+  }
 }
