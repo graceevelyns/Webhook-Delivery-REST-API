@@ -1,0 +1,1603 @@
+{
+  "info": {
+    "_postman_id": "00857162-2ce0-449e-9948-87c9de99f10b",
+    "name": "Webhook Delivery REST API",
+    "description": "This is a Postman collection for a **NestJS webhook delivery API**. It covers JWT authentication, project and webhook endpoint management, event publishing, webhook dispatch, delivery status tracking, and manual retry for failed deliveries.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "56168812",
+    "_collection_link": "https://go.postman.co/collection/56168812-00857162-2ce0-449e-9948-87c9de99f10b?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Grace\",\r\n    \"email\": \"grace-postman@email.com\",\r\n    \"password\": \"password\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success - 201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"name\": \"Grace\",\r\n    \"email\": \"grace-postman-2@email.com\",\r\n    \"password\": \"password\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/register",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "register"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "96"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"60-jPHgM2lLxXPhufe0nbkZuMDz12w\""
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 24 Sep 2026 12:07:56 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": \"57920231-54d0-439b-ae80-a3173bc493be\",\n  \"name\": \"Grace\",\n  \"email\": \"grace-postman-2@email.com\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();\r\n\r\npm.collectionVariables.set(\r\n    'accessToken',\r\n    response.access_token,\r\n);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success - 201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "252"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"fc-UzG80VlKNHXvn7klbA5gse6M6SY\""
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 24 Sep 2026 12:08:33 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"access_token\": \"<jwt-access-token>\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "Create Project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();\r\npm.collectionVariables.set('projectId', response.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Postman Project\",\r\n    \"description\": \"Project created from the Postman collection\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success - 201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"name\": \"Postman Project\",\r\n    \"description\": \"Project created from the Postman collection\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/projects",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "projects"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "256"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"100-v8K8nrNcu7Fq189+UXUU4+EEZ9E\""
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 24 Sep 2026 12:09:38 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": \"7a081248-a1cb-490d-b5a4-e275b72ebf19\",\n  \"userId\": \"211cdc98-f183-49d0-a759-f26281bad357\",\n  \"name\": \"Postman Project\",\n  \"description\": \"Project created from the Postman collection\",\n  \"createdAt\": \"2026-09-24T12:09:42.523Z\",\n  \"updatedAt\": \"2026-09-24T12:09:42.523Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Projects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/projects",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "projects"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "523"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"20b-KgZwCgxrxh2EBme/ZyNQJ66+gB0\""
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 24 Sep 2026 12:10:08 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": \"7a081248-a1cb-490d-b5a4-e275b72ebf19\",\n    \"userId\": \"211cdc98-f183-49d0-a759-f26281bad357\",\n    \"name\": \"Postman Project\",\n    \"description\": \"Project created from the Postman collection\",\n    \"createdAt\": \"2026-09-24T12:09:42.523Z\",\n    \"updatedAt\": \"2026-09-24T12:09:42.523Z\"\n  },\n  {\n    \"id\": \"5fcfd847-135e-43ac-afce-3b1fc1a74a29\",\n    \"userId\": \"211cdc98-f183-49d0-a759-f26281bad357\",\n    \"name\": \"Updated Postman Project\",\n    \"description\": \"Project updated from the Postman collection\",\n    \"createdAt\": \"2026-09-24T11:19:06.324Z\",\n    \"updatedAt\": \"2026-09-24T11:21:07.248Z\"\n  }\n]"
+            },
+            {
+              "name": "Error - 401 Unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/projects",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "projects"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "93"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"5d-n7buweIX1O4RN27Erlqo+W2LJLU\""
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 24 Sep 2026 12:23:14 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Missing or invalid authorization header\",\n  \"error\": \"Unauthorized\",\n  \"statusCode\": 401\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get One Project",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/projects/{{projectId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "projects",
+                    "{{projectId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "256"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"100-v8K8nrNcu7Fq189+UXUU4+EEZ9E\""
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 24 Sep 2026 12:10:35 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": \"7a081248-a1cb-490d-b5a4-e275b72ebf19\",\n  \"userId\": \"211cdc98-f183-49d0-a759-f26281bad357\",\n  \"name\": \"Postman Project\",\n  \"description\": \"Project created from the Postman collection\",\n  \"createdAt\": \"2026-09-24T12:09:42.523Z\",\n  \"updatedAt\": \"2026-09-24T12:09:42.523Z\"\n}"
+            },
+            {
+              "name": "Error - 404 Project Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/projects//00000000-0000-4000-8000-000000000000",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "projects",
+                    "",
+                    "00000000-0000-4000-8000-000000000000"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "109"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"6d-F+tTRAKZ7xCb89sHSdlrk2OKB3s\""
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 24 Sep 2026 12:26:25 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Cannot GET /projects//00000000-0000-4000-8000-000000000000\",\n  \"error\": \"Not Found\",\n  \"statusCode\": 404\n}"
+            }
+          ]
+        },
+        {
+          "name": "Patch Project",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Updated Postman Project\",\r\n    \"description\": \"Project updated from the Postman collection\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"name\": \"Updated Postman Project\",\r\n    \"description\": \"Project updated from the Postman collection\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/projects/{{projectId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "projects",
+                    "{{projectId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "264"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"108-2rie44SVM5VEZ5Tj7Xjn5WCsa24\""
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 24 Sep 2026 12:11:09 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": \"7a081248-a1cb-490d-b5a4-e275b72ebf19\",\n  \"userId\": \"211cdc98-f183-49d0-a759-f26281bad357\",\n  \"name\": \"Updated Postman Project\",\n  \"description\": \"Project updated from the Postman collection\",\n  \"createdAt\": \"2026-09-24T12:09:42.523Z\",\n  \"updatedAt\": \"2026-09-24T12:11:09.393Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Project",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success - 204 No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/projects/{{projectId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "projects",
+                    "{{projectId}}"
+                  ]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 24 Sep 2026 12:27:30 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Webhook Endpoints",
+      "item": [
+        {
+          "name": "Create Webhook Endpoint",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();\r\npm.collectionVariables.set('endpointId', response.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Webhook.site Receiver\",\r\n    \"url\": \"https://webhook.site/unique-id\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/webhook-endpoints",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}",
+                "webhook-endpoints"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success - 201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"name\": \"Webhook.site Receiver\",\r\n    \"url\": \"https://webhook.site/d0280d7a-7afc-4cd1-b1ce-193e2b1ef2a5\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/projects/{{projectId}}/webhook-endpoints",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "projects",
+                    "{{projectId}}",
+                    "webhook-endpoints"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "304"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"130-Tr2Ry5Y/ybMnpxApvdothjKvQPE\""
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 24 Sep 2026 12:17:21 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": \"2b18c356-3719-4b3f-8182-e16679bc8b77\",\n  \"projectId\": \"7a081248-a1cb-490d-b5a4-e275b72ebf19\",\n  \"name\": \"Webhook.site Receiver\",\n  \"url\": \"https://webhook.site/d0280d7a-7afc-4cd1-b1ce-193e2b1ef2a5\",\n  \"isActive\": true,\n  \"createdAt\": \"2026-09-24T12:17:25.197Z\",\n  \"updatedAt\": \"2026-09-24T12:17:25.197Z\",\n  \"deletedAt\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Webhook Endpoints",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/webhook-endpoints",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}",
+                "webhook-endpoints"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/projects/{{projectId}}/webhook-endpoints",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "projects",
+                    "{{projectId}}",
+                    "webhook-endpoints"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "306"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"132-Eo45eJgELW0d8BrM4Ix7nU+2/S8\""
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 24 Sep 2026 12:17:59 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": \"2b18c356-3719-4b3f-8182-e16679bc8b77\",\n    \"projectId\": \"7a081248-a1cb-490d-b5a4-e275b72ebf19\",\n    \"name\": \"Webhook.site Receiver\",\n    \"url\": \"https://webhook.site/d0280d7a-7afc-4cd1-b1ce-193e2b1ef2a5\",\n    \"isActive\": true,\n    \"createdAt\": \"2026-09-24T12:17:25.197Z\",\n    \"updatedAt\": \"2026-09-24T12:17:25.197Z\",\n    \"deletedAt\": null\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get One Webhook Endpoint",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/webhook-endpoints/{{endpointId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhook-endpoints",
+                "{{endpointId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/webhook-endpoints/{{endpointId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "webhook-endpoints",
+                    "{{endpointId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "304"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"130-Tr2Ry5Y/ybMnpxApvdothjKvQPE\""
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 24 Sep 2026 12:18:15 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": \"2b18c356-3719-4b3f-8182-e16679bc8b77\",\n  \"projectId\": \"7a081248-a1cb-490d-b5a4-e275b72ebf19\",\n  \"name\": \"Webhook.site Receiver\",\n  \"url\": \"https://webhook.site/d0280d7a-7afc-4cd1-b1ce-193e2b1ef2a5\",\n  \"isActive\": true,\n  \"createdAt\": \"2026-09-24T12:17:25.197Z\",\n  \"updatedAt\": \"2026-09-24T12:17:25.197Z\",\n  \"deletedAt\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Patch Webhook Endpoint",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Updated Webhook Receiver\",\r\n    \"isActive\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook-endpoints/{{endpointId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhook-endpoints",
+                "{{endpointId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"name\": \"Updated Webhook Receiver\",\r\n    \"isActive\": true\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/webhook-endpoints/{{endpointId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "webhook-endpoints",
+                    "{{endpointId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "307"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"133-XqdYOxsGXZfbJfvCcx29kewuctY\""
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 24 Sep 2026 12:18:35 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": \"2b18c356-3719-4b3f-8182-e16679bc8b77\",\n  \"projectId\": \"7a081248-a1cb-490d-b5a4-e275b72ebf19\",\n  \"name\": \"Updated Webhook Receiver\",\n  \"url\": \"https://webhook.site/d0280d7a-7afc-4cd1-b1ce-193e2b1ef2a5\",\n  \"isActive\": true,\n  \"createdAt\": \"2026-09-24T12:17:25.197Z\",\n  \"updatedAt\": \"2026-09-24T12:18:36.094Z\",\n  \"deletedAt\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Webhook Endpoint",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/webhook-endpoints/{{endpointId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhook-endpoints",
+                "{{endpointId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success - 204 No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/webhook-endpoints/{{endpointId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "webhook-endpoints",
+                    "{{endpointId}}"
+                  ]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 24 Sep 2026 12:27:06 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Events",
+      "item": [
+        {
+          "name": "Create Event",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();\r\npm.collectionVariables.set('eventId', response.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"type\": \"order.created\",\r\n    \"payload\": {\r\n    \"orderId\": \"order-123\",\r\n    \"customerId\": \"customer-456\",\r\n    \"total\": 150000,\r\n    \"paid\": true\r\n    }\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/events",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}",
+                "events"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success - 201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"type\": \"order.created\",\r\n    \"payload\": {\r\n    \"orderId\": \"order-123\",\r\n    \"customerId\": \"customer-456\",\r\n    \"total\": 150000,\r\n    \"paid\": true\r\n    }\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/projects/{{projectId}}/events",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "projects",
+                    "{{projectId}}",
+                    "events"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "247"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"f7-3aMuEqKTddklJ1DSzinhZNjauTU\""
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 24 Sep 2026 12:18:56 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": \"ba4fb7d2-91be-4b11-b4d6-40bcd53f474e\",\n  \"projectId\": \"7a081248-a1cb-490d-b5a4-e275b72ebf19\",\n  \"type\": \"order.created\",\n  \"payload\": {\n    \"orderId\": \"order-123\",\n    \"customerId\": \"customer-456\",\n    \"total\": 150000,\n    \"paid\": true\n  },\n  \"createdAt\": \"2026-09-24T12:18:56.622Z\"\n}"
+            },
+            {
+              "name": "Error - 400 Validation Failed",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"type\": \"\",\r\n    \"payload\": \"invalid\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/projects/{{projectId}}/events",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "projects",
+                    "{{projectId}}",
+                    "events"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "107"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"6b-9XOYzYlUfR7QmxYd17qNOE1r2xM\""
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 24 Sep 2026 12:25:35 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": [\n    \"type should not be empty\",\n    \"payload must be an object\"\n  ],\n  \"error\": \"Bad Request\",\n  \"statusCode\": 400\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Events",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/events",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}",
+                "events"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/projects/{{projectId}}/events",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "projects",
+                    "{{projectId}}",
+                    "events"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "249"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"f9-0bKka6KXW+SglpT1vs6jVKUqDFU\""
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 24 Sep 2026 12:19:17 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": \"ba4fb7d2-91be-4b11-b4d6-40bcd53f474e\",\n    \"projectId\": \"7a081248-a1cb-490d-b5a4-e275b72ebf19\",\n    \"type\": \"order.created\",\n    \"payload\": {\n      \"paid\": true,\n      \"total\": 150000,\n      \"orderId\": \"order-123\",\n      \"customerId\": \"customer-456\"\n    },\n    \"createdAt\": \"2026-09-24T12:18:56.622Z\"\n  }\n]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Deliveries",
+      "item": [
+        {
+          "name": "Get Event Deliveries",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const deliveries = pm.response.json();\r\n\r\nif (deliveries.length > 0) {\r\n    pm.collectionVariables.set('deliveryId', deliveries[0].id);\r\n}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/events/{{eventId}}/deliveries",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}",
+                "events",
+                "{{eventId}}",
+                "deliveries"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/projects/{{projectId}}/events/{{eventId}}/deliveries",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "projects",
+                    "{{projectId}}",
+                    "events",
+                    "{{eventId}}",
+                    "deliveries"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "599"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"257-a5SrlKfiVXnTkxg5sYkhYlOAzTQ\""
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 24 Sep 2026 12:19:29 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": \"96a49397-f4b9-44fc-95e2-02ed0df935c5\",\n    \"eventId\": \"ba4fb7d2-91be-4b11-b4d6-40bcd53f474e\",\n    \"webhookEndpointId\": \"2b18c356-3719-4b3f-8182-e16679bc8b77\",\n    \"targetUrl\": \"https://webhook.site/d0280d7a-7afc-4cd1-b1ce-193e2b1ef2a5\",\n    \"attemptNumber\": 1,\n    \"status\": \"SUCCESS\",\n    \"httpStatusCode\": 200,\n    \"responseBody\": \"This URL has no default content configured. <a href=\\\"https://webhook.site/#!/edit/d0280d7a-7afc-4cd1-b1ce-193e2b1ef2a5\\\">Change response in Webhook.site</a>.\",\n    \"errorMessage\": null,\n    \"createdAt\": \"2026-09-24T12:18:56.646Z\",\n    \"startedAt\": \"2026-09-24T12:18:56.658Z\",\n    \"finishedAt\": \"2026-09-24T12:18:57.336Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get Delivery",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/deliveries/{{deliveryId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "deliveries",
+                "{{deliveryId}}"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success - 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/deliveries/{{deliveryId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "deliveries",
+                    "{{deliveryId}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "597"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"255-rn61jV6xgbHKZWdbBe2dePTYKh4\""
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 24 Sep 2026 12:19:55 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": \"96a49397-f4b9-44fc-95e2-02ed0df935c5\",\n  \"eventId\": \"ba4fb7d2-91be-4b11-b4d6-40bcd53f474e\",\n  \"webhookEndpointId\": \"2b18c356-3719-4b3f-8182-e16679bc8b77\",\n  \"targetUrl\": \"https://webhook.site/d0280d7a-7afc-4cd1-b1ce-193e2b1ef2a5\",\n  \"attemptNumber\": 1,\n  \"status\": \"SUCCESS\",\n  \"httpStatusCode\": 200,\n  \"responseBody\": \"This URL has no default content configured. <a href=\\\"https://webhook.site/#!/edit/d0280d7a-7afc-4cd1-b1ce-193e2b1ef2a5\\\">Change response in Webhook.site</a>.\",\n  \"errorMessage\": null,\n  \"createdAt\": \"2026-09-24T12:18:56.646Z\",\n  \"startedAt\": \"2026-09-24T12:18:56.658Z\",\n  \"finishedAt\": \"2026-09-24T12:18:57.336Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Retry Delivery",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/deliveries/{{deliveryId}}/retry",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "deliveries",
+                "{{deliveryId}}",
+                "retry"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Error - 409 Delivery Already Successful",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/deliveries/{{deliveryId}}/retry",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "deliveries",
+                    "{{deliveryId}}",
+                    "retry"
+                  ]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "x-powered-by",
+                  "value": "Express"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "content-length",
+                  "value": "87"
+                },
+                {
+                  "key": "etag",
+                  "value": "W/\"57-hxoYrlQgExu2Ki7z/3LR+AU1EUg\""
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 24 Sep 2026 12:20:18 GMT"
+                },
+                {
+                  "key": "connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "keep-alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"message\": \"Only failed deliveries can be retried\",\n  \"error\": \"Conflict\",\n  \"statusCode\": 409\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": ""
+    },
+    {
+      "key": "email",
+      "value": ""
+    },
+    {
+      "key": "password",
+      "value": ""
+    }
+  ]
+}
