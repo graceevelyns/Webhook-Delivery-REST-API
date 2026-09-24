@@ -63,7 +63,7 @@ export class DeliveriesRepository {
   async markProcessing(id: string): Promise<boolean> {
     const result = await this.repository.update(
       { id, status: DeliveryStatus.Pending },
-      { status: DeliveryStatus.Processing, startedAt: new Date() },
+      { status: DeliveryStatus.Processing, startedAt: () => 'CURRENT_TIMESTAMP' },
     );
     return (result.affected ?? 0) > 0;
   }
@@ -80,7 +80,7 @@ export class DeliveriesRepository {
         httpStatusCode,
         responseBody,
         errorMessage: null,
-        finishedAt: new Date(),
+        finishedAt: () => 'CURRENT_TIMESTAMP',
       },
     );
   }
@@ -98,7 +98,7 @@ export class DeliveriesRepository {
         httpStatusCode,
         responseBody,
         errorMessage,
-        finishedAt: new Date(),
+        finishedAt: () => 'CURRENT_TIMESTAMP',
       },
     );
   }
