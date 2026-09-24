@@ -59,4 +59,47 @@ export class DeliveriesRepository {
       },
     });
   }
+
+  async markProcessing(id: string): Promise<boolean> {
+    const result = await this.repository.update(
+      { id, status: DeliveryStatus.Pending },
+      { status: DeliveryStatus.Processing, startedAt: new Date() },
+    );
+    return (result.affected ?? 0) > 0;
+  }
+
+  async markSuccess(
+    id: string,
+    httpStatusCode: number,
+    responseBody: string,
+  ): Promise<void> {
+    await this.repository.update(
+      { id, status: DeliveryStatus.Processing },
+      {
+        status: DeliveryStatus.Success,
+        httpStatusCode,
+        responseBody,
+        errorMessage: null,
+        finishedAt: new Date(),
+      },
+    );
+  }
+
+  async markFailed(
+    id: string,
+    httpStatusCode: number | null,
+    responseBody: string | null,
+    errorMessage: string,
+  ): Promise<void> {
+    await this.repository.update(
+      { id, status: DeliveryStatus.Processing },
+      {
+        status: DeliveryStatus.Failed,
+        httpStatusCode,
+        responseBody,
+        errorMessage,
+        finishedAt: new Date(),
+      },
+    );
+  }
 }
