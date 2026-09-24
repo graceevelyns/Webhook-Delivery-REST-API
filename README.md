@@ -1,124 +1,298 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Webhook Delivery REST API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A REST API for managing projects, webhook endpoints, events, and delivery attempts. It sends each event to all active endpoints in its project and records every delivery result.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+![Node.js](https://img.shields.io/badge/Node.js-24-5FA04E?logo=nodedotjs&logoColor=white)
+![NestJS](https://img.shields.io/badge/NestJS-12-E0234E?logo=nestjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?logo=postgresql&logoColor=white)
+![TypeORM](https://img.shields.io/badge/TypeORM-1.1-FE0803?logo=typeorm&logoColor=white)
+![pnpm](https://img.shields.io/badge/pnpm-12.4-F69220?logo=pnpm&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 
-## Description
+## Features
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Registration and login with JWT authentication
+- Password hashing with bcrypt
+- Project and webhook endpoint CRUD
+- Ownership-based resource access
+- Events with flexible JSON payloads
+- Delivery to multiple active endpoints
+- HTTP status, response, error, and timestamp tracking
+- Five-second delivery timeout
+- Manual retry of the latest failed delivery
+- DTO and environment validation
+- TypeORM migrations
+- End-to-end tests with Vitest and Supertest
+- Postman collection with request and response examples
 
-## Project setup
+## Technology Stack
 
-```bash
-$ pnpm install
+- Node.js 24, TypeScript, NestJS
+- PostgreSQL 17 and TypeORM
+- JWT and bcrypt
+- Zod and class-validator
+- Vitest and Supertest
+- Docker Compose and pnpm
+
+## Architecture
+
+The project combines a modular layered architecture with the repository pattern.
+
+```text
+HTTP Request
+     |
+     v
+Controller
+     |
+     v
+Service
+     |
+     v
+Repository
+     |
+     v
+PostgreSQL
 ```
 
-## Compile and run the project
+Each domain has its own NestJS module:
 
-```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+```text
+AuthModule
+UsersModule
+ProjectsModule
+WebhookEndpointsModule
+EventsModule
+DeliveriesModule
 ```
 
-## Run tests
+### Controller layer
 
-```bash
-# unit tests
-$ pnpm run test
+Controllers define routes, read validated input, and pass the authenticated user to services. They do not contain business rules or database queries.
 
-# e2e tests
-$ pnpm run test:e2e
+### Service layer
 
-# test coverage
-$ pnpm run test:cov
+Services implement business rules such as ownership checks, event publishing, delivery dispatch, status transitions, and retry eligibility.
+
+### Repository layer
+
+Repositories contain TypeORM queries, including ownership-scoped lookups, active endpoint selection, delivery creation, and status updates.
+
+### Why this architecture?
+
+The modular structure keeps each domain focused and independently testable. The layered flow separates HTTP handling, business rules, and persistence concerns. The repository pattern prevents TypeORM queries from spreading through controllers and services. This keeps business logic readable, makes ownership rules consistent, and allows persistence details to change without rewriting the HTTP layer.
+
+## Database Relationships
+
+![Webhook Delivery database entity relationship diagram](./docs/ERD.png)
+
+## Webhook Delivery Flow
+
+When a user publishes an event:
+
+1. The API verifies ownership of the project.
+2. It stores the event in PostgreSQL.
+3. It finds all active endpoints in the project.
+4. It creates one `PENDING` delivery per endpoint.
+5. Each delivery moves to `PROCESSING`.
+6. The API sends the event with an HTTP POST request.
+7. A 2xx response produces `SUCCESS`.
+8. A non-2xx response, timeout, or network error produces `FAILED`.
+9. The result and timestamps are stored for inspection.
+
+Response bodies are limited to the first 10,000 characters.
+
+The receiving endpoint gets:
+
+```json
+{
+  "id": "event-uuid",
+  "type": "order.created",
+  "payload": {
+    "orderId": "order-123",
+    "total": 150000
+  },
+  "createdAt": "2026-09-24T08:03:22.931Z"
+}
 ```
 
-## Deployment
+Only the latest failed attempt can be retried. A retry creates a new delivery row, increments `attemptNumber`, and sends the original event again.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Requirements
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+- Node.js 24 or later
+- pnpm
+- Docker and Docker Compose
 
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
+## Setup
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Observability
-
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
-
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
-
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
-
-To add it to this project:
+Install dependencies:
 
 ```bash
-$ pnpm install @nestjs/observe
+pnpm install
 ```
 
-Then follow the [setup guide](https://docs.nestjs.com/observability/overview) - it takes a single import and an app key.
+Create the environment file:
 
-The free plan needs no payment details and covers 300,000 events a month. You can also browse the [live demo](https://www.observe-demo.nestjs.com/dashboard) first - the whole dashboard over a busy service's data, with nothing to install.
+```bash
+cp .env.example .env
+```
 
-## Resources
+PowerShell:
 
-Check out a few resources that may come in handy when working with NestJS:
+```powershell
+Copy-Item .env.example .env
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+Default development variables:
 
-## Support
+```env
+NODE_ENV=development
+PORT=3000
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+DB_HOST=localhost
+DB_PORT=55432
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_NAME=webhook_delivery
 
-## Stay in touch
+JWT_SECRET=replace-with-at-least-32-characters
+JWT_EXPIRES_IN_SECONDS=3600
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Start PostgreSQL and run the migration:
 
-## License
+```bash
+docker compose up -d
+pnpm run migration:run
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Start the API:
+
+```bash
+pnpm run start:dev
+```
+
+The API runs at `http://localhost:3000`.
+
+## Database Migrations
+
+```bash
+# Show migration status
+pnpm run migration:show
+
+# Run pending migrations
+pnpm run migration:run
+
+# Revert the latest migration
+pnpm run migration:revert
+
+# Generate a migration after changing entities
+pnpm typeorm migration:generate ./src/database/migrations/MigrationName -d ./src/database/data-source.ts --pretty
+```
+
+TypeORM synchronization is disabled. Schema changes must use migrations.
+
+## API Endpoints
+
+Every endpoint except registration and login requires:
+
+```http
+Authorization: Bearer <access-token>
+```
+
+### Authentication
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/auth/register` | Register a user |
+| `POST` | `/auth/login` | Log in and receive a JWT |
+
+### Projects
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/projects` | Create a project |
+| `GET` | `/projects` | List the user's projects |
+| `GET` | `/projects/:id` | Get a project |
+| `PATCH` | `/projects/:id` | Update a project |
+| `DELETE` | `/projects/:id` | Delete a project |
+
+### Webhook Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/projects/:projectId/webhook-endpoints` | Create an endpoint |
+| `GET` | `/projects/:projectId/webhook-endpoints` | List project endpoints |
+| `GET` | `/webhook-endpoints/:id` | Get an endpoint |
+| `PATCH` | `/webhook-endpoints/:id` | Update an endpoint |
+| `DELETE` | `/webhook-endpoints/:id` | Soft-delete an endpoint |
+
+### Events
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/projects/:projectId/events` | Publish an event |
+| `GET` | `/projects/:projectId/events` | List project events |
+
+### Deliveries
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/projects/:projectId/events/:eventId/deliveries` | List event deliveries |
+| `GET` | `/deliveries/:id` | Get a delivery |
+| `POST` | `/deliveries/:id/retry` | Retry the latest failed attempt |
+
+## API Documentation
+
+The collection includes API requests, variables, scripts, and response examples:
+
+[Postman Collection](./docs/Webhook%20Delivery%20REST%20API.postman_collection.json)
+
+Import it into Postman and run the folders in this order:
+
+```text
+Authentication
+Projects
+Webhook Endpoints
+Events
+Deliveries
+```
+
+## Testing
+
+Start PostgreSQL, then run:
+
+```bash
+pnpm run test:e2e
+```
+
+The E2E suite covers authentication, JWT-protected routes, project and endpoint CRUD, ownership, event validation, successful and failed dispatch, and manual retry.
+
+## Project Structure
+
+```text
+src/
+├── auth/
+├── config/
+├── database/
+│   └── migrations/
+├── deliveries/
+├── events/
+├── projects/
+├── users/
+├── webhook-endpoints/
+├── app.module.ts
+└── main.ts
+
+test/
+├── auth.e2e-spec.ts
+├── deliveries.e2e-spec.ts
+├── events.e2e-spec.ts
+├── projects.e2e-spec.ts
+└── webhook-endpoints.e2e-spec.ts
+
+docs/
+├── ERD.png
+└── Webhook Delivery REST API.postman_collection.json
+```
